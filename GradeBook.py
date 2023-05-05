@@ -5,16 +5,16 @@ REMOVECOURSE = ["2", "r", "remove"]
 MODIFYCOURSE = ["3", "m", "modify"]
 VIEWCOURSE = ["4", "v", "view"]
 VIEWCOURSES = ["5", "c", "courses"]
-SAVE = ["6", "s", "save"]
-QUIT = ["7","q", "quit"]
+SAVE = ["s", "save"]
+QUIT = ["q", "quit"]
 
 LINE = "\n────────────────────────────────────\n"
 
 
 class Assignment:
     def __init__(self, assignment_name: str,
-                 weight: int,
-                 grade: int):
+                 weight: float,
+                 grade: float):
         """
         creates an assignment object
         """
@@ -160,28 +160,28 @@ def create_file() -> IO:
     return file
 
 
-def get_verify_weight() -> int:
+def get_verify_weight() -> float:
     """
     gets the weight from the user and verifies it
     """
     weight = input("Enter the weight of the assignment: ")
     ## loop until the weight is valid
-    while not weight.isnumeric() or int(weight) < 0 or int(weight) > 100:
+    while not weight.isnumeric() or float(weight) < 0 or float(weight) > 100:
         print("Invalid weight.")
         weight = input("Enter the weight of the assignment: ")
-    return int(weight)
+    return float(weight)
 
 
-def get_verify_grade() -> int:
+def get_verify_grade() -> float:
     """
     gets the grade from the user and verifies it
     """
     grade = input("Enter the grade of the assignment: ")
     ## loop until the grade is valid
-    while not grade.isnumeric() or int(grade) < 0 or int(grade) > 100:
+    while not grade.isnumeric() or float(grade) < 0 or float(grade) > 100:
         print("Invalid grade.")
         grade = input("Enter the grade of the assignment: ")
-    return int(grade)
+    return float(grade)
 
 
 def edit_assignment(course: Course) -> None:
@@ -209,6 +209,8 @@ def edit_assignment(course: Course) -> None:
         temp_assign = course.assignments_dict[assignment_name.lower()]
         temp_assign.assignment_name = new_name
         course.assignments_dict[new_name.lower()] = temp_assign
+        if new_name.lower() != assignment_name.lower():
+            course.assignments_dict.pop(assignment_name.lower())
         print("Assignment edited successfully.")
 
     elif name_or_weight.lower() == "w":
@@ -316,7 +318,6 @@ def edit_course(course_dict: dict[str, Course]) -> None:
             new_name = str(input("Enter the new name of the course: ")).strip()
             course_dict[course_name.lower()].course_name = new_name
             course_dict[new_name.lower()] = course_dict.pop(course_name.lower())
-            print("Course edited successfully.")
         ## if choice is assignments
         elif choice == "2":
             course_dict[course_name.lower()].course_menu()
@@ -324,32 +325,34 @@ def edit_course(course_dict: dict[str, Course]) -> None:
             ## loop until the user wants to go back and not quit and check choice is valid
             while course_choice != "B" and course_choice != "Q" and course_choice != "1" and course_choice != "2" and course_choice != "3":
                 print("Invalid choice.")
-                course_dict[course_name].course_menu()
+                course_dict[course_name.lower()].course_menu()
                 course_choice = input("Enter an action: ").upper()
             ## loop until the user wants to go back and not quit
             while course_choice != "B" and course_choice != "Q":
                 ## if choice is add assignment
                 if course_choice == "1":
-                    add_assignment(course_dict[course_name])
+                    add_assignment(course_dict[course_name.lower()])
                 ## if choice is edit assignment
                 elif course_choice == "2":
-                    if len(course_dict[course_name].assignments_dict) == 0:
+                    if len(course_dict[course_name.lower()].assignments_dict) == 0:
                         print("No assignments to remove.")
                     else:
-                        edit_assignment(course_dict[course_name])
+                        edit_assignment(course_dict[course_name.lower()])
                 ## if choice is remove assignment
                 elif course_choice == "3":
-                    if len(course_dict[course_name].assignments_dict) == 0:
+                    if len(course_dict[course_name.lower()].assignments_dict) == 0:
                         print("No assignments to remove.")
                     else:
-                        remove_assignment(course_dict[course_name])
+                        remove_assignment(course_dict[course_name.lower()])
                 course_dict[course_name.lower()].course_menu()
                 course_choice = input("Enter an action: ").upper().strip()
                 ## loop until the user wants to go back and not quit and check choice is valid
                 while course_choice != "B" and course_choice != "Q" and course_choice != "1" and course_choice != "2" and course_choice != "3":
                     print("Invalid choice.")
-                    course_dict[course_name].course_menu()
+                    course_dict[course_name.lower()].course_menu()
                     course_choice = input("Enter an action: ").upper().strip()
+            if course_choice == "Q":
+                exit()
         print("Course edited successfully.")
     else:
         print("Course not found.")
@@ -501,17 +504,17 @@ def initialisation() -> dict[str, Course]:
         ## loop through the number of courses
         for i in range(num_courses):
             ## read the course name
-            course_name = file.readline().strip().lower().strip()
+            course_name = file.readline().strip()
             ## read the number of assignments
             num_assignments = int(file.readline())
             ## create the course
-            course_dict[course_name] = Course(course_name, {})
+            course_dict[course_name.lower()] = Course(course_name, {})
             ## loop through the number of assignments
             for j in range(num_assignments):
                 ## read the assignment name, weight, and grade
                 assignment_name, weight, grade = file.readline().strip().split(",")
                 ## create the assignment
-                course_dict[course_name].assignments_dict[assignment_name] = Assignment(assignment_name, float(weight), float(grade))
+                course_dict[course_name.lower()].assignments_dict[assignment_name.lower()] = Assignment(assignment_name, float(weight), float(grade))
         file.close()
 
     return course_dict
