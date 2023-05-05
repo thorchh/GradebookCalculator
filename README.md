@@ -14,7 +14,7 @@ This program is designed to help students calculate their overall grade for a co
 1. Clone the repository to your local machine.
 2. Install Python 3 if it is not already installed on your system.
 3. Open a terminal or command prompt and navigate to the directory where the program was cloned.
-4. Run the command `python gradebook.py` to launch the program.
+4. Run the command `python GradeBook.py` to launch the program.
 
 ## Contributing
 
